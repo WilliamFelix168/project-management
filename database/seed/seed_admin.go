@@ -6,6 +6,7 @@ import (
 	"github.com/WilliamFelix168/learning-journey/tree/main/Golang/WPU/Project/project-management/config"
 	"github.com/WilliamFelix168/learning-journey/tree/main/Golang/WPU/Project/project-management/models"
 	"github.com/WilliamFelix168/learning-journey/tree/main/Golang/WPU/Project/project-management/utils"
+	"github.com/google/uuid"
 )
 
 func SeedAdmin() {
@@ -16,12 +17,13 @@ func SeedAdmin() {
 		Email:    "admin@example.com",
 		Password: password,
 		Role:     "admin",
+		PublicID: uuid.New(),
 	}
 
-	if err := config.DB.FirstOrCreate(&admin, models.User{Email: admin.Email}).Error;err != nil{
-		log.Println("Failed to seed admin user:", err);
-	}else {
-		log.Println("Admin user seeded successfully");
+	if err := config.DB.FirstOrCreate(&admin, models.User{Email: admin.Email}).Error; err != nil {
+		log.Println("Failed to seed admin user:", err)
+	} else {
+		log.Println("Admin user seeded successfully")
 	}
 
 }
