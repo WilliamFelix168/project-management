@@ -13,6 +13,7 @@ import (
 
 type UserService interface {
 	Register(user *models.User) error
+	Login(email, password string) (*models.User, error)
 	//method-method untuk user
 }
 
@@ -50,6 +51,21 @@ func (s *userService) Register(user *models.User) error {
 	// simpan user ke database lewat repository
 
 	return s.repo.Create(user)
+}
+
+func (s *userService) Login(email, password string) (*models.User, error) {
+	//cari user berdasarkan email
+	user, err := s.repo.FindByEmail(email)
+	if err != nil {
+		return nil, errors.New("Invalid Credentials")
+	}
+
+	//bandingkan password
+	if !utils.CheckPasswordHash(password, user.Password) {
+		return nil, errors.New("Invalid Credentials")
+	}
+
+	return user, nil
 }
 
 /*
