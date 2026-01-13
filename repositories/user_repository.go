@@ -12,6 +12,8 @@ import (
 type UserRepository interface {
 	Create(user *models.User) error
 	FindByEmail(email string) (*models.User, error)
+	FindByID(id uint) (*models.User, error)
+	FindByPublicID(publicID string) (*models.User, error)
 }
 
 // struct yang mengimplementasi UserRepository
@@ -33,5 +35,17 @@ func (r *userRepository) Create(user *models.User) error {
 func (r *userRepository) FindByEmail(email string) (*models.User, error) {
 	var user models.User
 	err := config.DB.Where("email = ?", email).First(&user).Error
+	return &user, err
+}
+
+func (r *userRepository) FindByID(id uint) (*models.User, error) {
+	var user models.User
+	err := config.DB.First(&user, id).Error
+	return &user, err
+}
+
+func (r *userRepository) FindByPublicID(publicID string) (*models.User, error) {
+	var user models.User
+	err := config.DB.Where("public_id = ?", publicID).First(&user).Error
 	return &user, err
 }
