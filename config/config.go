@@ -34,16 +34,15 @@ func LoadEnv() {
 		log.Println("Failed to load .env file")
 	}
 	AppConfig = &Config{
-		AppPort:    getEnv("APP_PORT", "8080"),
-		DBHost:     getEnv("DB_HOST", "localhost"),
-		DBPort:     getEnv("DB_PORT", "5432"),
-		DBUser:     getEnv("DB_USER", "postgres"),
-		DBPassword: getEnv("DB_PASSWORD", "password"),
-		DBName:     getEnv("DB_NAME", "project_management"),
-		JWTSecret:  getEnv("JWT_SECRET", "your_jwt_secret_key"),
-		//JWTExpireMinutes: getEnv("JWT_EXPIRE_MINUTES", "60"),
-		JWTRefreshToken: getEnv("JWT_REFRESH_TOKEN", "your_jwt_refresh_token_key"),
-		JWTExpire:       getEnv("JWT_EXPIRE", "1440"),
+		AppPort:         getEnv("APP_PORT", "8080"),
+		DBHost:          getEnv("DB_HOST", "localhost"),
+		DBPort:          getEnv("DB_PORT", "5432"),
+		DBUser:          getEnv("DB_USER", "postgres"),
+		DBPassword:      getEnv("DB_PASSWORD", "password"),
+		DBName:          getEnv("DB_NAME", "project_management"),
+		JWTSecret:       getEnv("JWT_SECRET", "your_jwt_secret_key"),
+		JWTRefreshToken: getEnv("REFRESH_TOKEN_EXPIRED", "your_jwt_refresh_token_key"),
+		JWTExpire:       getEnv("JWT_EXPIRED", "1440"),
 	}
 }
 
