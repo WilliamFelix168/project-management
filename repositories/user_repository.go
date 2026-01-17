@@ -3,6 +3,8 @@ package repositories
 //utk mengelola operasi database terkait user
 
 import (
+	"strings"
+
 	"github.com/WilliamFelix168/learning-journey/tree/main/Golang/WPU/Project/project-management/config"
 	"github.com/WilliamFelix168/learning-journey/tree/main/Golang/WPU/Project/project-management/models"
 )
@@ -14,6 +16,7 @@ type UserRepository interface {
 	FindByEmail(email string) (*models.User, error)
 	FindByID(id uint) (*models.User, error)
 	FindByPublicID(publicID string) (*models.User, error)
+	FindAllPagination(filter, sort string, limit, offset int) ([]models.User, int64, error)
 }
 
 // struct yang mengimplementasi UserRepository
@@ -48,4 +51,48 @@ func (r *userRepository) FindByPublicID(publicID string) (*models.User, error) {
 	var user models.User
 	err := config.DB.Where("public_id = ?", publicID).First(&user).Error
 	return &user, err
+}
+
+func (r *userRepository) FindAllPagination(filter, sort string, limit, offset int) ([]models.User, int64, error) {
+	var users []models.User
+	var total int64
+
+	//tujuan untuk mempermudah query
+	db := config.DB.Model(&models.User{})
+
+	//filtering
+	if filter != "" {
+		filterpattern := "%" + filter + "%"
+		//ILIKE untuk case insensitive
+		db = db.Where("name ILIKE ? OR email ILIKE ?", filterpattern, filterpattern)
+	}
+
+	//count total data sesuai filter
+	if err := db.Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	//sorting
+	if sort != "" {
+		// misalnya sort = "name asc" atau  "-name (desc)""
+		if sort == "-id" {
+			sort = "-internal_id"
+		} else if sort == "id" {
+			sort = "internal_id"
+		}
+
+		if strings.HasPrefix(sort, "-") {
+			sort = strings.TrimPrefix(sort, "-") + " DESC"
+		} else {
+			sort += " ASC"
+		}
+
+		db = db.Order(sort)
+
+	}
+
+	//pagination
+	err := db.Limit(limit).Offset(offset).Find(&users).Error
+	return users, total, err
+
 }

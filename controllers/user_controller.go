@@ -1,6 +1,9 @@
 package controllers
 
 import (
+	"math"
+	"strconv"
+
 	"github.com/WilliamFelix168/learning-journey/tree/main/Golang/WPU/Project/project-management/models"
 	"github.com/WilliamFelix168/learning-journey/tree/main/Golang/WPU/Project/project-management/services"
 	"github.com/WilliamFelix168/learning-journey/tree/main/Golang/WPU/Project/project-management/utils"
@@ -85,4 +88,41 @@ func (c *UserController) GetUser(ctx *fiber.Ctx) error {
 	}
 
 	return utils.Success(ctx, "User Found", userResp)
+}
+
+func (c *UserController) GetUserPagination(ctx *fiber.Ctx) error {
+	// /users/page?page=1&limit=10&sort=name&filter=triady
+	// 100/ 10 = 10 pages
+
+	//mengambil query parameter untuk filtering, sorting, pagination
+	page, _ := strconv.Atoi(ctx.Query("page", "1"))
+	limit, _ := strconv.Atoi(ctx.Query("limit", "10"))
+	offset := (page - 1) * limit
+
+	filter := ctx.Query("filter", "")
+	sort := ctx.Query("sort", "")
+
+	users, total, err := c.service.GetAllPagination(filter, sort, limit, offset)
+	if err != nil {
+		return utils.BadRequest(ctx, "Failed to get users", err.Error())
+	}
+
+	var usersResp []models.UserResponse
+	_ = copier.Copy(&usersResp, &users)
+
+	meta := utils.PaginationMeta{
+		Page:  page,
+		Limit: limit,
+		Total: int(total),
+		//TotalPages = total / limit 100 / 10 = 10 ||  100 / 3 = 33.33 -> 34
+		TotalPages: int(math.Ceil(float64(total) / float64(limit))),
+		Filter:     filter,
+		Sorting:    sort,
+	}
+
+	if total == 0 {
+		return utils.NotFoundPagination(ctx, "No Users Found", usersResp, meta)
+	}
+
+	return utils.SuccessPagination(ctx, "Users Found", usersResp, meta)
 }
