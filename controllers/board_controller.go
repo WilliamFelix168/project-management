@@ -27,11 +27,18 @@ func (c *BoardController) CreateBoard(ctx *fiber.Ctx) error {
 	//fungsi untuk mengambil data user dari context setelah token JWT terverifikasi
 	user := ctx.Locals("user").(*jwt.Token)
 	//fungsi untuk mengakses klaim (claims) dari token JWT
-	claims = user.Claims.(jwt.MapClaims)
+	claims := user.Claims.(jwt.MapClaims)
 
 	if err := ctx.BodyParser(board); err != nil {
 		return utils.BadRequest(ctx, "Error Read Request", err.Error())
 	}
+
+	userID, err = uuid.Parse(claims["pub_id"].(string))
+	if err != nil {
+		return utils.BadRequest(ctx, "Invalid User ID", err.Error())
+	}
+
+	board.OwnerPublicID = userID
 
 	if err := c.service.Create(board); err != nil {
 		return utils.BadRequest(ctx, "Failed to create board", err.Error())
