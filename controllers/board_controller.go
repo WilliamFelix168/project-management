@@ -46,3 +46,35 @@ func (c *BoardController) CreateBoard(ctx *fiber.Ctx) error {
 
 	return utils.Success(ctx, "Board Created Successfully", board)
 }
+
+func (c *BoardController) UpdateBoard(ctx *fiber.Ctx) error {
+	publicID := ctx.Params("id")
+	board := new(models.Board)
+
+	if err := ctx.BodyParser(board); err != nil {
+		return utils.BadRequest(ctx, "Error Parsing Data", err.Error())
+	}
+
+	if _, err := uuid.Parse(publicID); err != nil {
+		return utils.BadRequest(ctx, "ID Not Valid", err.Error())
+	}
+
+	existingBoard, err := c.service.GetByPublicID(publicID)
+
+	if err != nil {
+		return utils.NotFound(ctx, "Board Not Found", err.Error())
+	}
+
+	board.InternalID = existingBoard.InternalID
+	board.PublicID = existingBoard.PublicID
+	board.OwnerID = existingBoard.OwnerID
+	board.OwnerPublicID = existingBoard.OwnerPublicID
+	board.CreatedAt = existingBoard.CreatedAt
+
+	if err := c.service.Update(board); err != nil {
+		return utils.BadRequest(ctx, "Failed to update board", err.Error())
+	}
+
+	return utils.Success(ctx, "Board Updated Successfully", board)
+
+}
