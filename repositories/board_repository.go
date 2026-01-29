@@ -1,6 +1,8 @@
 package repositories
 
 import (
+	"time"
+
 	"github.com/WilliamFelix168/learning-journey/tree/main/Golang/WPU/Project/project-management/config"
 	"github.com/WilliamFelix168/learning-journey/tree/main/Golang/WPU/Project/project-management/models"
 )
@@ -10,6 +12,7 @@ type BoardRepository interface {
 	Create(board *models.Board) error
 	Update(board *models.Board) error
 	FindByPublicID(publicID string) (*models.Board, error)
+	AddMember(boardID uint, userIDs []uint) error
 }
 
 // fungsi untuk mengimplementasi BoardRepository
@@ -42,4 +45,22 @@ func (r *boardRepository) FindByPublicID(publicID string) (*models.Board, error)
 	var board models.Board
 	err := config.DB.Where("public_id = ?", publicID).First(&board).Error
 	return &board, err
+}
+
+func (c *boardRepository) AddMember(boardID uint, userIDs []uint) error {
+
+	if len(userIDs) == 0 {
+		return nil
+	}
+
+	now := time.Now()
+	var members []models.BoardMember
+	for _, userID := range userIDs {
+		members = append(members, models.BoardMember{
+			BoardID:  int64(boardID),
+			UserID:   int64(userID),
+			JoinedAt: now,
+		})
+	}
+	return config.DB.Create(&members).Error
 }
