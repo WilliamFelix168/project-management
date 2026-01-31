@@ -13,6 +13,7 @@ type BoardRepository interface {
 	Update(board *models.Board) error
 	FindByPublicID(publicID string) (*models.Board, error)
 	AddMember(boardID uint, userIDs []uint) error
+	RemoveMembers(boardID uint, userIDs []uint) error
 }
 
 // fungsi untuk mengimplementasi BoardRepository
@@ -63,4 +64,13 @@ func (c *boardRepository) AddMember(boardID uint, userIDs []uint) error {
 		})
 	}
 	return config.DB.Create(&members).Error
+}
+
+func (r *boardRepository) RemoveMembers(boardID uint, userIDs []uint) error {
+
+	if len(userIDs) == 0 {
+		return nil
+	}
+
+	return config.DB.Where("board_internal_id = ? AND user_internal_id IN (?)", boardID, userIDs).Delete(&models.BoardMember{}).Error
 }
