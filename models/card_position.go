@@ -5,7 +5,7 @@ import (
 	"github.com/google/uuid"
 )
 
-type CardPostion struct {
+type CardPosition struct {
 	InternalId     int64           `json:"internal_id" gorm:"column:primary_key;autoIncrement"`
 	PublicId       uuid.UUID       `json:"public_id" gorm:"type:uuid;not null"`
 	ListInternalId int64           `json:"list_internal_id" gorm:"column:list_internal_id;not null"`
