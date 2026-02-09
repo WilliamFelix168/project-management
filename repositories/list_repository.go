@@ -7,6 +7,11 @@ import (
 )
 
 type ListRepository interface {
+	Create(list *models.List) error
+	Update(list *models.List) error
+	Delete(id uint) error
+	UpdatePosition(boardPublicId string, position []string) error
+	GetCardPosition(listPublicId string) ([]uuid.UUID, error)
 }
 
 type listRepository struct {
