@@ -12,6 +12,9 @@ type ListRepository interface {
 	Delete(id uint) error
 	UpdatePosition(boardPublicId string, position []string) error
 	GetCardPosition(listPublicId string) ([]uuid.UUID, error)
+	FindByBoardID(boardId string) ([]models.List, error)
+	FindByPublicID(publicId string) (*models.List, error)
+	FindByID(id uint) (*models.List, error)
 }
 
 type listRepository struct {
@@ -47,4 +50,22 @@ func (r *listRepository) GetCardPosition(listPublicId string) ([]uuid.UUID, erro
 	var position models.CardPosition
 	err := config.DB.Joins("JOIN lists on lists.internal_id = card_positions.list_internal_id").Where("lists.public_id = ?", listPublicId).First(&position).Error
 	return position.CardOrder, err
+}
+
+func (r *listRepository) FindByBoardID(boardId string) ([]models.List, error) {
+	var list []models.List
+	err := config.DB.Where("board_public_id = ?", boardId).Order("internal_id ASC").Find(&list).Error
+	return list, err
+}
+
+func (r *listRepository) FindByPublicID(publicId string) (*models.List, error) {
+	var list models.List
+	err := config.DB.Where("public_id = ?", publicId).First(&list).Error
+	return &list, err
+}
+
+func (r *listRepository) FindByID(id uint) (*models.List, error) {
+	var list models.List
+	err := config.DB.First(&list, id).Error
+	return &list, err
 }
