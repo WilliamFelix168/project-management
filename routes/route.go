@@ -15,7 +15,8 @@ import (
 // s kecil dipakai biar ga bisa diakses dari luar package, begitu sebaliknya
 func Setup(app *fiber.App,
 	uc *controllers.UserController,
-	bc *controllers.BoardController) {
+	bc *controllers.BoardController,
+	lc *controllers.ListController) {
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Failed to load .env file")
@@ -47,4 +48,15 @@ func Setup(app *fiber.App,
 	boardGroup.Post("/:id/members", bc.AddBoardMembers)
 	boardGroup.Delete("/:id/members", bc.RemoveBoardMembers)
 	boardGroup.Get("/my", bc.GetMyBoardPaginate)
+
+	//list
+	listGroup := api.Group("/lists")
+	listGroup.Post("/", lc.CreateList)
+	// listGroup.Get("/board/:boardPublicId", lc.GetListsByBoardID)
+	// listGroup.Get("/:id", lc.GetListByID)
+	// listGroup.Get("/public/:publicId", lc.GetListByPublicID)
+	// listGroup.Put("/:id", lc.UpdateList)
+	// listGroup.Delete("/:id", lc.DeleteList)
+	// listGroup.Put("/board/:boardPublicId/positions", lc.UpdateListPositions)
+
 }
