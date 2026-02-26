@@ -6,6 +6,10 @@ import (
 )
 
 func SortListsByPosition(lists []models.List, order []uuid.UUID) []models.List {
+	if len(order) == 0 {
+		return lists
+	}
+
 	sortedLists := make([]models.List, 0, len(lists))
 	listMap := make(map[uuid.UUID]models.List)
 
@@ -39,8 +43,8 @@ Fungsi ini mengubah urutan list sesuai dengan order yang diberikan.
 Penjelasan Detail:
 func SortListsByPosition(lists []models.List, order []uuid.UUID) []models.List
 
-Input 1: lists = daftar list yang belum terurut 
-Input 2: order = urutan ID yang diinginkan 
+Input 1: lists = daftar list yang belum terurut
+Input 2: order = urutan ID yang diinginkan
 Output: list yang sudah terurut sesuai order
 
 
@@ -70,10 +74,10 @@ Ambil dari map sesuai urutan di order:
 
 Contoh:
 
-order = [id3, id1, id2] 
-Ambil id3 → tambah ke hasil 
-Ambil id1 → tambah ke hasil 
-Ambil id2 → tambah ke hasil 
+order = [id3, id1, id2]
+Ambil id3 → tambah ke hasil
+Ambil id1 → tambah ke hasil
+Ambil id2 → tambah ke hasil
 Hasil: urutan berubah sesuai keinginan ✅
 Gampangnya: Fungsi ini seperti playlist - list awal acak, order adalah urutan putar yang diinginkan.
 
