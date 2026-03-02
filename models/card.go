@@ -7,14 +7,14 @@ import (
 )
 
 type Card struct {
-	InternalId     int64      `json:"internal_id" db:"internal_id" gorm:"primaryKey;autoIncrement"`
-	PublicId       uuid.UUID  `json:"public_id" db:"public_id"`
-	ListInternalId int64      `json:"list_internal_id" db:"list_internal_id" gorm:"column:list_internal_id"`
-	Title          string     `json:"title" db:"title"`
-	Description    string     `json:"description" db:"description"`
-	DueDate        *time.Time `json:"due_date,omitempty" db:"due_date"`
-	Position       int        `json:"position" db:"position"`
-	CreatedAt      time.Time  `json:"created_at" db:"created_at"`
+	InternalId  int64      `json:"internal_id" db:"internal_id" gorm:"primaryKey;autoIncrement"`
+	PublicID    uuid.UUID  `json:"public_id" db:"public_id"`
+	ListID      int64      `json:"list_internal_id" db:"list_internal_id" gorm:"column:list_internal_id"`
+	Title       string     `json:"title" db:"title"`
+	Description string     `json:"description" db:"description"`
+	DueDate     *time.Time `json:"due_date,omitempty" db:"due_date"`
+	Position    int        `json:"position" db:"position"`
+	CreatedAt   time.Time  `json:"created_at" db:"created_at"`
 
 	//Relasi
 	Assigness  []CardAssignee   `json:"assigness,omitempty" gorm:"foreignKey:CardID;references:InternalId"`
