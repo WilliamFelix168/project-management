@@ -3,6 +3,7 @@ package services
 import (
 	"errors"
 	"fmt"
+	"sort"
 	"time"
 
 	"github.com/WilliamFelix168/learning-journey/tree/main/Golang/WPU/Project/project-management/config"
@@ -44,8 +45,8 @@ func (s *cardService) Create(card *models.Card, listPublicID string) error {
 	card.ListID = list.InternalID
 
 	//3. Generate public_id jika belum ada
-	if card.PublicId == uuid.Nil {
-		card.PublicId = uuid.New()
+	if card.PublicID == uuid.Nil {
+		card.PublicID = uuid.New()
 	}
 	card.CreatedAt = time.Now()
 
@@ -72,7 +73,7 @@ func (s *cardService) Create(card *models.Card, listPublicID string) error {
 			position = models.CardPosition{
 				PublicId:  uuid.New(),
 				ListID:    list.InternalID,
-				CardOrder: types.UUIDArray{card.PublicId},
+				CardOrder: types.UUIDArray{card.PublicID},
 			}
 			if err := tx.Create(&position).Error; err != nil {
 				tx.Rollback()
@@ -83,7 +84,7 @@ func (s *cardService) Create(card *models.Card, listPublicID string) error {
 			return fmt.Errorf("failed to find card position: %w", err)
 		}
 	} else {
-		position.CardOrder = append(position.CardOrder, card.PublicId)
+		position.CardOrder = append(position.CardOrder, card.PublicID)
 		if err := tx.Model(&models.CardPosition{}).Where("internal_id = ?", position.InternalId).Update("card_order", position.CardOrder).Error; err != nil {
 			tx.Rollback()
 			return fmt.Errorf("failed to update card position: %w", err)
@@ -186,6 +187,75 @@ func (s *cardService) Update(card *models.Card, listPublicID string) error {
 	if err := tx.Commit().Error; err != nil {
 		return fmt.Errorf("failed to commit transaction: %w", err)
 	}
-	
+
 	return nil
+}
+
+func (s *cardService) Delete(id uint) error {
+	return s.cardRepo.Delete(id)
+}
+
+func (s *cardService) GetByListID(listPublicID string) ([]*models.Card, error) {
+	//verfikasi list
+	list, err := s.listRepo.FindByPublicID(listPublicID)
+	if err != nil {
+		return nil, fmt.Errorf("list not found: %w", err)
+	}
+
+	//ambil card position
+	position, err := s.cardRepo.FindCardPositionByListID(list.InternalID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to find card position: %w", err)
+	}
+
+	//ambil semua card berdasarkan posisi
+	cards, err := s.cardRepo.FindByListID(listPublicID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to find cards: %w", err)
+	}
+
+	//sorting cards berdasarkan posisi
+	if position != nil && len(position.CardOrder) > 0 {
+		cards = SortCardByPosition(cards, position.CardOrder)
+	}
+
+	return cards, nil
+}
+
+func SortCardByPosition(cards []*models.Card, order []uuid.UUID) []*models.Card {
+	//buat map untuk pencarian cepat
+	orderMap := make(map[uuid.UUID]int)
+	for i, id := range order {
+		orderMap[id] = i
+	}
+
+	defaultIndex := len(order) //untuk card yang tidak ada di order, letakkan di akhir
+
+	//sorting slice
+	sort.SliceStable(cards, func(i, j int) bool {
+		//ambil index posisi dari map
+		indexI, okI := orderMap[cards[i].PublicID]
+		if !okI {
+			indexI = defaultIndex
+		}
+
+		indexJ, okJ := orderMap[cards[j].PublicID]
+		if !okJ {
+			indexJ = defaultIndex
+		}
+
+		if indexI == indexJ {
+			return cards[i].CreatedAt.Before(cards[j].CreatedAt)
+		}
+		return indexI < indexJ
+	})
+	return cards
+}
+
+func (s *cardService) GetByID(id uint) (*models.Card, error) {
+	return s.cardRepo.FindByID(id)
+}
+
+func (s *cardService) GetByPublicID(publicID string) (*models.Card, error) {
+	return s.cardRepo.FindByPublicID(publicID)
 }
