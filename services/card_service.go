@@ -174,7 +174,7 @@ func (s *cardService) Update(card *models.Card, listPublicID string) error {
 	}
 
 	//update card
-	card.InternalId = existingCard.InternalId
+	card.InternalID = existingCard.InternalID
 	card.PublicID = existingCard.PublicID
 	card.ListID = existingCard.ListID
 

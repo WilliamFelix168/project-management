@@ -7,7 +7,7 @@ import (
 )
 
 type Card struct {
-	InternalId  int64     `json:"internal_id" db:"internal_id" gorm:"primaryKey;autoIncrement"`
+	InternalID  int64     `json:"internal_id" db:"internal_id" gorm:"primaryKey;autoIncrement"`
 	PublicID    uuid.UUID `json:"public_id" db:"public_id"`
 	ListID      int64     `json:"list_internal_id" db:"list_internal_id" gorm:"column:list_internal_id"`
 	Title       string    `json:"title" db:"title"`
@@ -17,7 +17,7 @@ type Card struct {
 	CreatedAt   time.Time `json:"created_at" db:"created_at"`
 
 	//Relasi
-	Assigness  []CardAssignee   `json:"assigness,omitempty" gorm:"foreignKey:CardID;references:InternalId"`
-	Attachment []CardAttachment `json:"attachment,omitempty" gorm:"foreignKey:CardID;references:InternalId"`
-	Labels     []CardLabel      `json:"labels,omitempty" gorm:"foreignKey:CardID;references:InternalId"`
+	Assigness   []CardAssignee   `json:"assigness,omitempty" gorm:"foreignKey:CardID;references:InternalID"`
+	Attachments []CardAttachment `json:"attachments,omitempty" gorm:"foreignKey:CardID;references:InternalID"`
+	Labels      []CardLabel      `json:"labels,omitempty" gorm:"foreignKey:CardID;references:InternalID"`
 }

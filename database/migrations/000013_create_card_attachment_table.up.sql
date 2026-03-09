@@ -1,4 +1,4 @@
-CREATE TABLE card_attachment(
+CREATE TABLE card_attachments(
     internal_id BIGSERIAL PRIMARY KEY,
     public_id UUID NOT NULL DEFAULT gen_random_uuid(),
     file varchar(255) NOT NULL,

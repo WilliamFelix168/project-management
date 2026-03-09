@@ -49,16 +49,17 @@ func (r *cardRepository) FindByID(id uint) (*models.Card, error) {
 func (r *cardRepository) FindByPublicID(publicID string) (*models.Card, error) {
 	var card models.Card
 	if err := config.DB.Preload("Assigness.User", func(tx *gorm.DB) *gorm.DB {
-		return tx.Select("internal_id, public_id, name, email")
+		return tx.Select("internal_id", "public_id", "name", "email")
 	}).Preload("Attachments").Where("public_id = ?", publicID).First(&card).Error; err != nil {
 		return nil, err
 	}
 
 	baseURL := config.AppConfig.APPURL
 
-	for i := range card.Attachment {
-		card.Attachment[i].FileURL = fmt.Sprintf("%s/files/%s", baseURL, filepath.Base(card.Attachment[i].File))
+	for i := range card.Attachments {
+		card.Attachments[i].FileURL = fmt.Sprintf("%s/files/%s", baseURL, filepath.Base(card.Attachments[i].File))
 	}
+
 	return &card, nil
 }
 

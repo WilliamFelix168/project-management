@@ -1,1 +1,1 @@
-drop table card_attachment;
+drop table card_attachments;

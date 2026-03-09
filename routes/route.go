@@ -60,6 +60,6 @@ func Setup(app *fiber.App,
 	//card
 	cardGroup := api.Group("/cards")
 	cardGroup.Post("/", cc.CreateCard)
-	// cardGroup.Put("/:id", cc.UpdateCard)
+	cardGroup.Put("/:id", cc.UpdateCard)
 	// cardGroup.Delete("/:id", cc.DeleteCard)
 }
