@@ -81,3 +81,36 @@ func (c *CardController) UpdateCard(ctx *fiber.Ctx) error {
 
 	return utils.Success(ctx, "Card updated successfully", card)
 }
+
+func (c *CardController) DeleteCard(ctx *fiber.Ctx) error {
+	publicID := ctx.Params("id")
+
+	if _, err := uuid.Parse(publicID); err != nil {
+		return utils.BadRequest(ctx, "Invalid ID", err.Error())
+	}
+
+	card, err := c.service.GetByPublicID(publicID)
+	if err != nil {
+		return utils.InternalServerError(ctx, "Failed to find card", err.Error())
+	}
+
+	if err := c.service.Delete(uint(card.InternalID)); err != nil {
+		return utils.BadRequest(ctx, "Failed to delete card", err.Error())
+	}
+
+	return utils.Success(ctx, "Card deleted successfully", nil)
+}
+
+func (c *CardController) GetCardDetail(ctx *fiber.Ctx) error {
+	publicID := ctx.Params("id")
+	card, err := c.service.GetByPublicID(publicID)
+	if err != nil {
+		return utils.InternalServerError(ctx, "Failed to find card", err.Error())
+	}
+
+	if card == nil {
+		return utils.NotFound(ctx, "Card not found", err.Error())
+	}
+
+	return utils.Success(ctx, "Card retrieved successfully", card)
+}
