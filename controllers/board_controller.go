@@ -10,6 +10,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/google/uuid"
+	"github.com/jinzhu/copier"
 )
 
 type BoardController struct {
@@ -134,4 +135,21 @@ func (c *BoardController) GetMyBoardPaginate(ctx *fiber.Ctx) error {
 	}
 	return utils.SuccessPagination(ctx, "Boards Retrieved Successfully", boards, meta)
 
+}
+
+func (c *BoardController) GetBoardById(ctx *fiber.Ctx) error {
+	id := ctx.Params("id")
+	board, err := c.service.GetByPublicID(id)
+	if err != nil {
+		return utils.NotFound(ctx, "Board Not Found", err.Error())
+	}
+
+	var boardResp models.Board
+	err = copier.Copy(&boardResp, &board)
+
+	if err != nil {
+		return utils.BadRequest(ctx, "Internal Server Error", err.Error())
+	}
+
+	return utils.Success(ctx, "Board Found", boardResp)
 }

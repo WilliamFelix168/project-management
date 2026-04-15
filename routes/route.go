@@ -50,6 +50,7 @@ func Setup(app *fiber.App,
 	boardGroup.Delete("/:id/members", bc.RemoveBoardMembers)
 	boardGroup.Get("/my", bc.GetMyBoardPaginate)
 	boardGroup.Get("/:board_id/lists", lc.GetListOnBoard)
+	boardGroup.Get("/:id", bc.GetBoardById)
 
 	//list
 	listGroup := api.Group("/lists")
