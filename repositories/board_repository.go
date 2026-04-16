@@ -15,6 +15,7 @@ type BoardRepository interface {
 	AddMember(boardID uint, userIDs []uint) error
 	RemoveMembers(boardID uint, userIDs []uint) error
 	FindAllByUserPaginate(userPublicID, filter, sort string, limit, offset int) ([]models.Board, int64, error)
+	Delete(id uint) error
 }
 
 // fungsi untuk mengimplementasi BoardRepository
@@ -105,4 +106,8 @@ func (r *boardRepository) FindAllByUserPaginate(userPublicID, filter, sort strin
 	}
 
 	return boards, total, nil
+}
+
+func (r *boardRepository) Delete(id uint) error {
+	return config.DB.Delete(&models.Board{}, id).Error
 }

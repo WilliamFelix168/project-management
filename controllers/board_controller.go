@@ -153,3 +153,21 @@ func (c *BoardController) GetBoardById(ctx *fiber.Ctx) error {
 
 	return utils.Success(ctx, "Board Found", boardResp)
 }
+
+func (c *BoardController) DeleteBoard(ctx *fiber.Ctx) error {
+	publicID := ctx.Params("id")
+	if _, err := uuid.Parse(publicID); err != nil {
+		return utils.BadRequest(ctx, "Invalid ID", err.Error())
+	}
+
+	board, err := c.service.GetByPublicID(publicID)
+	if err != nil {
+		return utils.NotFound(ctx, "Board not found", err.Error())
+	}
+
+	if err := c.service.Delete(uint(board.InternalID)); err != nil {
+		return utils.BadRequest(ctx, "Failed to delete board", err.Error())
+	}
+
+	return utils.Success(ctx, "Board deleted successfully", publicID)
+}
