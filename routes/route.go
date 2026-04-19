@@ -58,6 +58,7 @@ func Setup(app *fiber.App,
 	listGroup.Get("/:list_id/cards", cc.GetCardOnList)
 	listGroup.Post("/", lc.CreateList)
 	listGroup.Put("/:id", lc.UpdateList)
+	listGroup.Put("/:id/positions", lc.UpdateListPositions)
 	listGroup.Delete("/:id", lc.DeleteList)
 
 	//card
