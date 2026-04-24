@@ -14,6 +14,7 @@ type BoardService interface {
 	GetByPublicID(publicID string) (*models.Board, error)
 	AddMembers(boardPublicID string, userPublicIDs []string) error
 	RemoveMembers(boardPublicID string, userPublicIDs []string) error
+	GetMembersByBoardID(boardPublicID string) ([]models.User, error)
 	GetAllByUserPaginate(userID, filter, sort string, limit, offset int) ([]models.Board, int64, error)
 	Delete(id uint) error
 }
@@ -55,6 +56,11 @@ func (s *boardService) Update(board *models.Board) error {
 
 func (s *boardService) GetByPublicID(publicID string) (*models.Board, error) {
 	return s.boardRepo.FindByPublicID(publicID)
+}
+
+
+func (s *boardService) GetMembersByBoardID(boardPublicID string) ([]models.User, error) {
+	return s.boardMemberRepo.GetMembers(boardPublicID)
 }
 
 func (s *boardService) AddMembers(boardPublicID string, userPublicIDs []string) error {

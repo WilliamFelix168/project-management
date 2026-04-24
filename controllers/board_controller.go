@@ -171,3 +171,17 @@ func (c *BoardController) DeleteBoard(ctx *fiber.Ctx) error {
 
 	return utils.Success(ctx, "Board deleted successfully", publicID)
 }
+
+func (c *BoardController) GetBoardMembers(ctx *fiber.Ctx) error {
+	boardPublicID := ctx.Params("board_id")
+
+	if _, err := uuid.Parse(boardPublicID); err != nil {
+		return utils.BadRequest(ctx, "Invalid Board ID", err.Error())
+	}
+
+	boardMembers, err := c.service.GetMembersByBoardID(boardPublicID)
+	if err != nil {
+		return utils.NotFound(ctx, "Board Member not found for the board", err.Error())
+	}
+	return utils.Success(ctx, "Board Members retrieved successfully", boardMembers)
+}

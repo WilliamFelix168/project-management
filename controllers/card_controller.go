@@ -122,9 +122,9 @@ func (c *CardController) GetCardOnList(ctx *fiber.Ctx) error {
 		return utils.BadRequest(ctx, "Invalid List ID", err.Error())
 	}
 
-	cards, err := c.service.GetByListID(listPublicID)
-	if err != nil {
-		return utils.NotFound(ctx, "Cards not found for the list", err.Error())
-	}
+	cards, _ := c.service.GetByListID(listPublicID)
+	// if err != nil {
+	// 	return utils.NotFound(ctx, "Cards not found for the list", err.Error())
+	// }
 	return utils.Success(ctx, "Cards retrieved successfully", cards)
 }
