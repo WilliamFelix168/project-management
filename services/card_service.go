@@ -174,12 +174,13 @@ func (s *cardService) Update(card *models.Card, listPublicID string) error {
 
 		// Set card ke list baru sebelum disimpan
 		card.ListID = newList.InternalID
+	} else {
+		card.ListID = existingCard.ListID
 	}
 
 	//update card
 	card.InternalID = existingCard.InternalID
 	card.PublicID = existingCard.PublicID
-	//card.ListID = existingCard.ListID
 
 	if err := tx.Save(card).Error; err != nil {
 		tx.Rollback()
