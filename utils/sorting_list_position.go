@@ -10,28 +10,27 @@ func SortListsByPosition(lists []models.List, order []uuid.UUID) []models.List {
 		return lists
 	}
 
-	sortedLists := make([]models.List, 0, len(lists))
-	listMap := make(map[uuid.UUID]models.List)
-
-	//untuk mapping list by publicID
-	for _, list := range lists {
-		// mapping list by publicID
-		listMap[list.PublicID] = list
+	sorted := make([]models.List, 0, len(lists))
+	m := make(map[uuid.UUID]models.List, len(lists))
+	for _, l := range lists {
+		m[l.PublicID] = l
 	}
 
-	//untuk sorting berdasarkan order
-	for _, pos := range order {
-		if list, exists := listMap[pos]; exists {
-			sortedLists = append(sortedLists, list)
+	added := make(map[uuid.UUID]bool, len(lists))
+	for _, id := range order {
+		if v, ok := m[id]; ok {
+			sorted = append(sorted, v)
+			added[id] = true
 		}
 	}
 
-	//contoh
-	// order: [id3, id1, id2]
-	// lists: [{id1}, {id2}, {id3}]
-	// result: [{id3}, {id1}, {id2}]
+	for _, l := range lists {
+		if !added[l.PublicID] {
+			sorted = append(sorted, l)
+		}
+	}
 
-	return sortedLists
+	return sorted
 }
 
 /*

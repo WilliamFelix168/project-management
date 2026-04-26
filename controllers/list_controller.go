@@ -99,26 +99,19 @@ func (c *ListController) UpdateListPositions(ctx *fiber.Ctx) error {
 		return utils.BadRequest(ctx, "Invalid ID", err.Error())
 	}
 
-	var body struct {
-		Positions []uuid.UUID
-	}
+	var positions []uuid.UUID
 
-	if err := ctx.BodyParser(&body); err != nil {
+	if err := ctx.BodyParser(&positions); err != nil {
 		return utils.BadRequest(ctx, "Error Data Parsing", err.Error())
 	}
 
-	if len(body.Positions) == 0 {
+	if len(positions) == 0 {
 		return utils.BadRequest(ctx, "Positions is required", "positions cannot be empty")
 	}
 
-	existingList, err := c.services.GetByPublicID(publicID)
-	if err != nil {
-		return utils.NotFound(ctx, "List not found", err.Error())
-	}
-
-	if err := c.services.UpdatePositions(existingList.BoardPublicID.String(), body.Positions); err != nil {
+	if err := c.services.UpdatePositions(publicID, positions); err != nil {
 		return utils.BadRequest(ctx, "Failed to update list positions", err.Error())
 	}
 
-	return utils.Success(ctx, "List positions updated successfully", body.Positions)
+	return utils.Success(ctx, "List positions updated successfully", positions)
 }
