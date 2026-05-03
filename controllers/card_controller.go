@@ -70,7 +70,7 @@ func (c *CardController) UpdateCard(ctx *fiber.Ctx) error {
 	card := models.Card{
 		Title:       req.Title,
 		Description: req.Description,
-		DueDate:     time.Time{},
+		DueDate:     *req.DueDate,
 		Position:    req.Position,
 		PublicID:    uuid.MustParse(publicID),
 	}
