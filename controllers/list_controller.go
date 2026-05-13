@@ -93,25 +93,38 @@ func (c *ListController) DeleteList(ctx *fiber.Ctx) error {
 }
 
 func (c *ListController) UpdateListPositions(ctx *fiber.Ctx) error {
-	publicID := ctx.Params("id")
+	boardID := ctx.Params("board_id")
 
-	if _, err := uuid.Parse(publicID); err != nil {
+	if _, err := uuid.Parse(boardID); err != nil {
 		return utils.BadRequest(ctx, "Invalid ID", err.Error())
 	}
 
-	var positions []uuid.UUID
+	var positionUUID []uuid.UUID
 
-	if err := ctx.BodyParser(&positions); err != nil {
+	if err := ctx.BodyParser(&positionUUID); err != nil {
+		var positionString []string
+		if err := ctx.BodyParser(&positionString); err != nil {
+			return utils.BadRequest(ctx, "Invalid Position Format", err.Error())
+		}
+
+		for _, idStr := range positionString {
+			id, err := uuid.Parse(idStr)
+			if err != nil {
+				return utils.BadRequest(ctx, "Invalid UUID in positions", err.Error())
+			}
+			positionUUID = append(positionUUID, id)
+		}
+
 		return utils.BadRequest(ctx, "Error Data Parsing", err.Error())
 	}
 
-	if len(positions) == 0 {
+	if len(positionUUID) == 0 {
 		return utils.BadRequest(ctx, "Positions is required", "positions cannot be empty")
 	}
 
-	if err := c.services.UpdatePositions(publicID, positions); err != nil {
-		return utils.BadRequest(ctx, "Failed to update list positions", err.Error())
+	if err := c.services.UpdatePositions(boardID, positionUUID); err != nil {
+		return utils.InternalServerError(ctx, "Failed to update list positions", err.Error())
 	}
 
-	return utils.Success(ctx, "List positions updated successfully", positions)
+	return utils.Success(ctx, "List positions updated successfully", positionUUID)
 }
